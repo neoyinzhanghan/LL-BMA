@@ -27,7 +27,7 @@ from torch.utils.data import WeightedRandomSampler
 
 
 # Within package imports ###########################################################################
-from LLBMA..resources.BMAassumptions import *
+from LLBMA.resources.BMAassumptions import *
 
 
 ############################################################################
