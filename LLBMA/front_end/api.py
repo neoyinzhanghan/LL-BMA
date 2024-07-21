@@ -2,9 +2,8 @@ import openslide
 from LLBMA.resources.BMAassumptions import topview_level
 from LLBMA.vision.processing import read_with_timeout
 from LLBMA.brain.SpecimenClf import get_specimen_type, calculate_specimen_conf
-from LLBMA.PBCounter import PBCounter
 from LLBMA.BMACounter import BMACounter
-
+from LLBMA.BMATopView import SpecimenError
 
 def get_specimen_conf_dict(slide_path):
     """Get the confidence score for each specimen type of the slide. """
@@ -61,7 +60,7 @@ def classify_specimen_type(slide_path):
         return "Others"
 
 
-def heme_analyze(
+def analyse_bma(
     slide_path, dump_dir, hoarding=False, continue_on_error=False, do_extract_features=False
 ):
     """First classify the slide specimen type.
@@ -90,16 +89,16 @@ def heme_analyze(
         bma_counter.tally_differential()
 
     elif specimen_type == "PB":
-        # use PBCounter to tally differential
-        pb_counter = PBCounter(
-            slide_path,
-            hoarding=hoarding,
-            continue_on_error=continue_on_error,
-            do_extract_features=do_extract_features,
+        raise SpecimenError(
+            f"Cannot analyze the slide {slide_path} as it is classified as PB"
         )
-        pb_counter.tally_differential()
 
     elif specimen_type == "MPBorIBMA":
+
+        # warn the user that the slide is classified as MPBorIBMA without raising an error
+        print(
+            f"UserWarning: The slide {slide_path} as it is classified as MPBorIBMA by the Specimen Classifier. Running BMACounter to tally differential on inadequate BMA or manual PB specimens would likely lead to bad results."
+        )
         # use BMACounter to tally differential
         bma_counter = BMACounter(
             slide_path,
