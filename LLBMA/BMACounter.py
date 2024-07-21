@@ -22,9 +22,8 @@ from pathlib import Path
 from LLBMA.PBDifferential import Differential, to_count_dict
 from LLBMA.FileNameManager import FileNameManager
 from LLBMA.BMATopView import TopView, SpecimenError, TopViewError
-from LLBMA.brain.HemeLabelLightningManager import HemeLabelLightningManager
+from LLBMA.brain.labeller.HemeLabelLightningManager import HemeLabelLightningManager
 from LLBMA.brain.BMAYOLOManager import YOLOManager
-from LLBMA.brain.FeatureEngineer import CellFeatureEngineer
 from LLBMA.vision.processing import SlideError, read_with_timeout
 from LLBMA.vision.BMAWSICropManager import WSICropManager
 from LLBMA.communication.write_config import *
@@ -77,7 +76,7 @@ class BMACounter:
         overwrite: bool = True,
         error: bool = False,
     ):
-        """Initialize a PBCounter object."""
+        """Initialize a BMACounter object."""
 
         self.profiling_data = {}
 
@@ -836,155 +835,6 @@ class BMACounter:
         self.differential = Differential(self.wbc_candidates)
 
         self.profiling_data["label_wbc_candidates_time"] = time.time() - start_time
-
-    def extract_features(self):
-        """Extract features"""
-        if not self.do_extract_features:
-            for arch in supported_feature_extraction_archs:
-                self.profiling_data[f"cell_feature_extraction_time_{arch}"] = 0
-
-            return None
-
-        for arch in supported_feature_extraction_archs:
-            ckpt_path = feature_extractor_ckpt_dict[arch]
-            start_time = time.time()
-
-            if self.wbc_candidates == [] or self.wbc_candidates is None:
-                raise NoCellFoundError(
-                    "No WBC candidates found. Please run find_wbc_candidates() first. If problem persists, the slide may be problematic."
-                )
-            ray.shutdown()
-            # ray.init(num_cpus=num_cpus, num_gpus=num_gpus)
-            ray.init()
-
-            list_of_batches = create_list_of_batches_from_list(
-                self.wbc_candidates, cell_clf_batch_size
-            )
-
-            if self.verbose:
-                print(f"Initializing CellFeatureEngineer for architecture {arch}")
-            task_managers = [
-                CellFeatureEngineer.remote(arch=arch, ckpt_path=ckpt_path)
-                for _ in range(num_labellers)
-            ]
-
-            tasks = {}
-            all_results = []
-
-            for i, batch in enumerate(list_of_batches):
-                manager = task_managers[i % num_labellers]
-                task = manager.async_extract_batch.remote(batch)
-                tasks[task] = batch
-
-            with tqdm(
-                total=len(self.wbc_candidates),
-                desc=f"Extract WBC candidates features for architecture {arch}",
-            ) as pbar:
-                while tasks:
-                    done_ids, _ = ray.wait(list(tasks.keys()))
-
-                    for done_id in done_ids:
-                        try:
-                            batch = ray.get(done_id)
-                            for wbc_candidate in batch:
-                                all_results.append(wbc_candidate)
-
-                                pbar.update()
-
-                        except RayTaskError as e:
-                            self.error = True
-                            print(
-                                f"Task for WBC candidate {tasks[done_id]} failed with error: {e}"
-                            )
-
-                        del tasks[done_id]
-
-            if self.verbose:
-                print(f"Shutting down Ray")
-            ray.shutdown()
-
-            self.wbc_candidates = all_results
-            self.differential = Differential(self.wbc_candidates)
-
-            self.profiling_data[f"cell_feature_extraction_time_{arch}"] = (
-                time.time() - start_time
-            )
-
-    def extract_features_with_augmentation(self):
-        """Extract features with augmentation."""
-
-        if not self.do_extract_features:
-            for arch in supported_feature_extraction_archs:
-                self.profiling_data[
-                    f"cell_augmented_feature_extraction_time_{arch}"
-                ] = 0
-
-            return None
-
-        for arch in supported_feature_extraction_archs:
-            ckpt_path = feature_extractor_ckpt_dict[arch]
-            start_time = time.time()
-
-            if self.wbc_candidates == [] or self.wbc_candidates is None:
-                raise NoCellFoundError(
-                    "No WBC candidates found. Please run find_wbc_candidates() first. If problem persists, the slide may be problematic."
-                )
-            ray.shutdown()
-            # ray.init(num_cpus=num_cpus, num_gpus=num_gpus)
-            ray.init()
-
-            list_of_batches = create_list_of_batches_from_list(
-                self.wbc_candidates, cell_clf_batch_size
-            )
-
-            if self.verbose:
-                print(f"Initializing CellFeatureEngineer for architecture {arch}")
-            task_managers = [
-                CellFeatureEngineer.remote(arch=arch, ckpt_path=ckpt_path)
-                for _ in range(num_labellers)
-            ]
-
-            tasks = {}
-            all_results = []
-
-            for i, batch in enumerate(list_of_batches):
-                manager = task_managers[i % num_labellers]
-                task = manager.async_extract_batch_with_augmentation.remote(batch)
-                tasks[task] = batch
-
-            with tqdm(
-                total=len(self.wbc_candidates),
-                desc=f"Extract Augmented WBC candidates features for architecture {arch}",
-            ) as pbar:
-                while tasks:
-                    done_ids, _ = ray.wait(list(tasks.keys()))
-
-                    for done_id in done_ids:
-                        try:
-                            batch = ray.get(done_id)
-                            for wbc_candidate in batch:
-                                all_results.append(wbc_candidate)
-
-                                pbar.update()
-
-                        except RayTaskError as e:
-                            self.error = True
-                            print(
-                                f"Task for WBC candidate {tasks[done_id]} failed with error: {e}"
-                            )
-
-                        del tasks[done_id]
-
-            if self.verbose:
-                print(f"Shutting down Ray")
-            ray.shutdown()
-
-            self.wbc_candidates = all_results
-            self.differential = Differential(self.wbc_candidates)
-
-            self.profiling_data[f"cell_augmented_feature_extraction_time_{arch}"] = (
-                time.time() - start_time
-            )
 
     def _save_results(self):
         """Save the results of the PBCounter object."""
