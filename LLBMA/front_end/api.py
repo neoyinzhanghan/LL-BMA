@@ -62,7 +62,7 @@ def classify_specimen_type(slide_path):
 
 
 def heme_analyze(
-    slide_path, hoarding=False, continue_on_error=False, do_extract_features=False
+    slide_path, dump_dir, hoarding=False, continue_on_error=False, do_extract_features=False
 ):
     """First classify the slide specimen type.
     --If BMA, then use BMACounter to tally differential.
@@ -82,6 +82,7 @@ def heme_analyze(
         # use BMACounter to tally differential
         bma_counter = BMACounter(
             slide_path,
+            dump_dir=dump_dir,
             hoarding=hoarding,
             continue_on_error=continue_on_error,
             do_extract_features=do_extract_features,
