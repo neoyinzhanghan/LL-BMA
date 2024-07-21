@@ -1009,33 +1009,34 @@ class BMACounter:
 
             if self.differential is None:
                 self.label_wbc_candidates()
-                self.extract_features()
-                self.extract_features_with_augmentation()
             self._save_results()
 
             # Save profiling data as a csv file
             self.profiling_data["total_time"] = sum(self.profiling_data.values())
 
-            self.profiling_data["total_feature_extraction_time"] = sum(
-                [
-                    self.profiling_data[f"cell_feature_extraction_time_{arch}"]
-                    for arch in supported_feature_extraction_archs
-                ]
-            ) + sum(
-                [
-                    self.profiling_data[
-                        f"cell_augmented_feature_extraction_time_{arch}"
-                    ]
-                    for arch in supported_feature_extraction_archs
-                ]
-            )
+            self.profiling_data["total_feature_extraction_time"] = 0
+            # sum(
+            #     [
+            #         self.profiling_data[f"cell_feature_extraction_time_{arch}"]
+            #         for arch in supported_feature_extraction_archs
+            #     ]
+            # ) + sum(
+            #     [
+            #         self.profiling_data[
+            #             f"cell_augmented_feature_extraction_time_{arch}"
+            #         ]
+            #         for arch in supported_feature_extraction_archs
+            #     ]
+            # )
 
-            self.profiling_data["total_features_hoarding_time"] = sum(
-                [
-                    self.profiling_data[f"cell_extracted_features_hoarding_time_{arch}"]
-                    for arch in supported_feature_extraction_archs
-                ]
-            )
+            self.profiling_data["total_features_hoarding_time"] = 0
+            
+            # sum(
+            #     [
+            #         self.profiling_data[f"cell_extracted_features_hoarding_time_{arch}"]
+            #         for arch in supported_feature_extraction_archs
+            #     ]
+            # )
 
             self.profiling_data["hoarding_time"] = (
                 self.profiling_data["high_mag_focus_regions_hoarding_time"]

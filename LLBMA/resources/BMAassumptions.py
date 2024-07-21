@@ -94,9 +94,7 @@ HemeLabel_ckpt_path = "/media/hdd3/neo/MODELS/2024-06-11  DeepHemeRetrain non-fr
 specimen_clf_checkpoint_path = "/home/greg/Documents/neo/LLCKPTS/SClf.ckpt"
 
 
-feature_extractor_ckpt_dict = {
-    "resnet50": "/media/hdd3/neo/resources/HemeLabel_weights.ckpt"
-}
+feature_extractor_ckpt_dict = {}
 supported_feature_extraction_archs = feature_extractor_ckpt_dict.keys()
 
 high_mag_region_clf_ckpt_path = "/media/hdd3/neo/MODELS/2024-04-24 BMARegionClf High Mag w Aug/1/version_0/checkpoints/epoch=199-step=11000.ckpt"
