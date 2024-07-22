@@ -9,7 +9,7 @@ from torchvision.datasets import ImageFolder
 from torchvision.models import resnet50, ResNet50_Weights
 from torch.utils.data import DataLoader
 from PIL import Image
-from LLBMA.resources.PBassumptions import specimen_clf_checkpoint_path
+from LLBMA.resources.BMAassumptions import specimen_clf_checkpoint_path
 from LLBMA.resources.BMAassumptions import (
     topview_level,
     search_view_level,

@@ -10,7 +10,7 @@ import pyvips
 # Within package imports ###########################################################################
 from LLBMA.vision.image_quality import VoL
 from LLBMA.BMAFocusRegion import FocusRegion
-from LLBMA.resources.PBassumptions import *
+from LLBMA.resources.BMAassumptions import *
 
 
 # @ray.remote(num_cpus=num_cpus_per_cropper)

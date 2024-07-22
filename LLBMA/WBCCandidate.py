@@ -10,7 +10,7 @@ import torch
 
 # Within package imports ###########################################################################
 from LLBMA.vision.image_quality import VoL
-from LLBMA.resources.PBassumptions import *
+from LLBMA.resources.BMAassumptions import *
 
 
 class WBCCandidate:

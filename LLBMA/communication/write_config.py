@@ -8,7 +8,7 @@ import yaml
 
 
 # Within package imports ###########################################################################
-from LLBMA.resources.PBassumptions import *
+from LLBMA.resources.BMAassumptions import *
 
 
 def numpy_to_python(value):

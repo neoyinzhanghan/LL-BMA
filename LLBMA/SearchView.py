@@ -6,7 +6,7 @@
 from PIL import Image
 
 # Within package imports ###########################################################################
-from LLBMA.resources.PBassumptions import *
+from LLBMA.resources.from LLBMA.umptions import *
 from LLBMA.vision.processing import crop_region_view
 
 
