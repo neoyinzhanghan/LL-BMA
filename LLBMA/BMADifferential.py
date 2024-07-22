@@ -12,7 +12,7 @@ from LLBMA.resources.BMAassumptions import *
 
 
 class Differential:
-    """A class representing the differential of a PBCounter object.
+    """A class representing the differential of a BMACounter object.
 
     === Class Attributes ===
     - wbc_candidate_df : a pandas dataframe containing the information of the WBC candidates
@@ -166,13 +166,13 @@ class Differential:
 
         return tally_string
 
-    def compute_PB_differential(
+    def compute_BMA_differential(
         self,
         omitted_classes=omitted_classes,
         removed_classes=removed_classes,
         differential_group_dict=differential_group_dict,
     ):
-        """Return a dictionary of the tally of the differential for the final PB result.
+        """Return a dictionary of the tally of the differential for the final BMA result.
         Use differential_group_dict to group the cells into the following categories:
         Immature Granulocyte, Neutrophil, Eosinophil, Blast, Monocyte, Lymphocyte, Nucleated RBC, Basophil.
         """
@@ -184,12 +184,12 @@ class Differential:
         tally = self.tally_dict(omitted_classes, removed_classes, print_results=False)
 
         # create a new dictionary
-        PB_tally = {}
+        BMA_tally = {}
 
         # traverse through the keys of differential_group_dict
-        for key in PB_final_classes:
+        for key in BMA_final_classes:
             # initialize the value of the key to be 0
-            PB_tally[key] = 0
+            BMA_tally[key] = 0
 
             # traverse through the values of the key
             for value in differential_group_dict[key]:
@@ -197,15 +197,15 @@ class Differential:
                     continue
 
                 # add the value to the key
-                PB_tally[key] += tally[value]
+                BMA_tally[key] += tally[value]
 
-        print("Final PB differential:")
-        for cellname in PB_tally:
-            print(f"{cellname}: {PB_tally[cellname]}")
+        print("Final BMA differential:")
+        for cellname in BMA_tally:
+            print(f"{cellname}: {BMA_tally[cellname]}")
 
-        self.diff_dict = PB_tally
+        self.diff_dict = BMA_tally
 
-        return PB_tally
+        return BMA_tally
 
     def save_cells_info(self, save_dir):
         """Save the cell info df at save_dir/cells/cells_info.csv after adding a new column which is the class of the cell."""

@@ -11,6 +11,10 @@ snap_shot_size = 96
 num_classes = 23
 do_zero_pad = False
 
+assumed_mpp_level_0 = 0.25
+assumed_search_view_downsample_rate = 8
+assumed_top_view_downsample_rate = 2**7
+
 #######################
 ### Quality Control ###
 #######################
@@ -244,40 +248,34 @@ cellnames_dict = {
 supported_extensions = [".svs", ".ndpi"]
 
 differential_group_dict = {
-    "Immature Granulocyte": ["M3"],
-    "Neutrophil": ["M4", "M5", "M6"],
-    "Eosinophil": ["E1", "E4"],
-    "Blast": ["M1", "ER1", "M2"],
-    "Monocyte": ["MO2"],
-    "Lymphocyte": ["L2", "L4"],
-    "Nucleated RBC": ["ER2", "ER3", "ER4"],
-    "Basophil": ["B2", "B1"],
+    "blasts": ["M1", "M2", "ER1"],
+    "blast-equivalents": [],
+    "promyelocytes": ["M2"],
+    "myelocytes": ["M3"],
+    "metamyelocytes": ["M4"],
+    "neutrophils/bands": ["M5", "M6"],
+    "monocytes": ["MO2"],
+    "eosinophils": ["E1", "E4"],
+    "erythroid precursors": ["ER1", "ER2", "ER3", "ER4"],
+    "lymphocytes": ["L2"],
+    "plasma cells": ["L4"],
 }
 
-# differential_group_dict = {
-#     'Immature Granulocyte': ['M3'],
-#     'Neutrophil': ['M4', 'M5', 'M6'],
-#     'Eosinophil': ['E0', 'E1', 'E2', 'E3', 'E4'],
-#     'Blast': ['M1', 'ER1', 'M2'],
-#     'Monocyte': ['MO2'],
-#     'Lymphocyte': ['L2'],
-#     'Nucleated RBC': ['ER2', 'ER3', 'ER4'],
-#     'Basophil': ['B2', 'B1'],
-# }
-
-PB_final_classes = [
-    "Immature Granulocyte",
-    "Neutrophil",
-    "Eosinophil",
-    "Blast",
-    "Monocyte",
-    "Lymphocyte",
-    "Nucleated RBC",
-    "Basophil",
+BMA_final_classes = [
+    "blasts",
+    "blast-equivalents",
+    "myelocytes",
+    "metamyelocytes",
+    "neutrophils/bands",
+    "monocytes",
+    "eosinophils",
+    "erythroid precursors",
+    "lymphocytes",
+    "plasma cells",
 ]
 
-omitted_classes = ["ER5", "ER6", "U4"]
-removed_classes = ["U1", "PL2", "PL3"]
+omitted_classes = ["B1", "B2"]
+removed_classes = ["U1", "PL2", "PL3", "ER5", "ER6", "U4"]
 
 # kept_cellnames are the cellnames that are not in omitted_classes and removed_classes
 kept_cellnames = [
