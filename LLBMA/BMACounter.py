@@ -849,7 +849,7 @@ class BMACounter:
 
         diff_full_class_dict = self.differential.tally_diff_full_class_dict()
         diff_class_dict = self.differential.tally_dict()
-        diff_dict = self.differential.compute_PB_differential()
+        diff_dict = self.differential.compute_BMA_differential()
 
         # save the diff_full_class_dict as a csv file called save_dir/differential_full.csv, where the first row is the class and the second row is the value
         diff_full_csv_path = os.path.join(self.save_dir, "differential_full_class.csv")
