@@ -19,7 +19,7 @@ from ray.exceptions import RayTaskError
 from pathlib import Path
 
 # Within package imports ###########################################################################
-from LLBMA.PBDifferential import Differential, to_count_dict
+from LLBMA.BMADifferential import Differential, to_count_dict
 from LLBMA.FileNameManager import FileNameManager
 from LLBMA.BMATopView import TopView, SpecimenError, TopViewError
 from LLBMA.brain.labeller.HemeLabelLightningManager import HemeLabelLightningManager
@@ -50,9 +50,9 @@ class BMACounter:
     - focus_regions : a list of FocusRegion class objects representing the focus regions of the search view
     - differential : a Differential class object representing the differential of the WSI
     - save_dir : the directory to save the diagnostic logs, dataframes (and images if hoarding is True
-    - profiling_data : a dictionary containing the profiling data of the PBCounter object
+    - profiling_data : a dictionary containing the profiling data of the BMACounter object
 
-    - verbose : whether to print out the progress of the PBCounter object
+    - verbose : whether to print out the progress of the BMACounter object
     - hoarding : whether to hoard regions and cell images processed into permanent storage
     - continue_on_error : whether to continue processing the WSI if an error occurs
     - ignore_specimen_type : whether to ignore the specimen type of the WSI
@@ -467,7 +467,7 @@ class BMACounter:
             self.profiling_data["hoarding_high_mag_check_time"] = 0
 
     def find_wbc_candidates(self):
-        """Update the wbc_candidates of the PBCounter object."""
+        """Update the wbc_candidates of the BMACounter object."""
 
         start_time = time.time()
 
