@@ -29,8 +29,10 @@ from LLBMA.vision.BMAWSICropManager import WSICropManager
 from LLBMA.communication.write_config import *
 from LLBMA.communication.visualization import *
 from LLBMA.brain.utils import *
-from LLBMA.communication.saving import *
-from LLBMA.brain.SpecimenClf import get_specimen_type
+from LLBMA.brain.SpecimenClf import (
+    get_specimen_type,
+    check_slide_magnification_assumptions,
+)
 from LLBMA.SearchView import SearchView
 from LLBMA.BMAFocusRegion import *
 from LLBMA.BMAFocusRegionTracker import FocusRegionsTracker, NotEnoughFocusRegionsError
@@ -59,7 +61,7 @@ class BMACounter:
 
     - predicted_specimen_type: the predicted specimen type of the WSI
     - wsi_path : the path to the WSI
-    
+
     - dump_dir : the directory to save the diagnostic logs, dataframes (and images if hoarding is True
     """
 
@@ -131,6 +133,8 @@ class BMACounter:
                 print(f"Processing WSI top view as TopView object")
             # Processing the top level image
             top_level = topview_level
+
+            check_slide_magnification_assumptions(wsi=wsi)
 
             if self.verbose:
                 print(f"Obtaining top view image")
@@ -964,20 +968,9 @@ class BMACounter:
             self.profiling_data["cells_hoarding_time"] = time.time() - start_time
 
             if self.do_extract_features:
-                for arch in supported_feature_extraction_archs:
-                    start_time = time.time()
-                    for wbc_candidate in tqdm(
-                        self.wbc_candidates, desc=f"Saving {arch} features"
-                    ):
-                        wbc_candidate._save_cell_feature(self.save_dir, arch)
-
-                    save_augmented_cell_features(
-                        self.wbc_candidates, arch, self.save_dir
-                    )
-
-                    self.profiling_data[
-                        f"cell_extracted_features_hoarding_time_{arch}"
-                    ] = (time.time() - start_time)
+                raise NotImplementedError(
+                    "Feature extraction is not implemented in the current version."
+                )
 
             else:
                 for arch in supported_feature_extraction_archs:
@@ -1030,7 +1023,7 @@ class BMACounter:
             # )
 
             self.profiling_data["total_features_hoarding_time"] = 0
-            
+
             # sum(
             #     [
             #         self.profiling_data[f"cell_extracted_features_hoarding_time_{arch}"]
@@ -1102,7 +1095,8 @@ class BMACounter:
                 os.rename(
                     self.save_dir,
                     os.path.join(
-                        self.dump_dir, "ERROR_" + Path(self.file_name_manager.wsi_path).stem
+                        self.dump_dir,
+                        "ERROR_" + Path(self.file_name_manager.wsi_path).stem,
                     ),
                 )
 

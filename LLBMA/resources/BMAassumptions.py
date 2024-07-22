@@ -11,9 +11,9 @@ snap_shot_size = 96
 num_classes = 23
 do_zero_pad = False
 
-assumed_mpp_level_0 = 0.25
+assumed_mpp_level_0 = 0.2297952524300848
 assumed_search_view_downsample_rate = 8
-assumed_top_view_downsample_rate = 2**7
+assumed_top_view_downsample_rate = 128
 
 #######################
 ### Quality Control ###

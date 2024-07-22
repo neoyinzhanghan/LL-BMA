@@ -10,7 +10,13 @@ from torchvision.models import resnet50, ResNet50_Weights
 from torch.utils.data import DataLoader
 from PIL import Image
 from LLBMA.resources.PBassumptions import specimen_clf_checkpoint_path
-from LLBMA.resources.BMAassumptions import topview_level
+from LLBMA.resources.BMAassumptions import (
+    topview_level,
+    search_view_level,
+    assumed_mpp_level_0,
+    assumed_search_view_downsample_rate,
+    assumed_top_view_downsample_rate,
+)
 from LLBMA.vision.processing import SlideError, read_with_timeout
 
 class_dct = {
@@ -273,3 +279,22 @@ def predict_bma(slide_path):
     bma_conf = specimen_conf_dict["Bone Marrow Aspirate"]
 
     return argmax_class, bma_conf
+
+
+def check_slide_magnification_assumptions(wsi):
+    """wsi is an openslide object.
+    Check that the level 0 mpp is equal to the assumed mpp level 0.
+    Check the downsample factor of the search view and top view levels are equal to the assumed downsample rates.
+    """
+
+    assert round(float(wsi.properties.get("openslide.mpp-x", "Unknown")), 4) == round(
+        assumed_mpp_level_0, 4
+    ), f"Level 0 mpp {wsi.properties.get('openslide.mpp-x', 'Unknown')} does not match the assumed mpp level 0 {assumed_mpp_level_0}."
+
+    assert round(wsi.level_downsamples[search_view_level], 4) == round(
+        assumed_search_view_downsample_rate, 4
+    ), f"Search view downsample rate {wsi.level_downsamples[search_view_level]} does not match the assumed search view downsample rate {assumed_search_view_downsample_rate}."
+
+    assert round(wsi.level_downsamples[topview_level], 4) == round(
+        assumed_top_view_downsample_rate, 4
+    ), f"Top view downsample rate {wsi.level_downsamples[topview_level]} does not match the assumed top view downsample rate {assumed_top_view_downsample_rate}."

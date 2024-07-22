@@ -7,7 +7,7 @@ import os
 from pathlib import Path
 
 # Within package imports ############################################################################
-from LLBMA.resources.PBassumptions import *
+from LLBMA.resources.BMAassumptions import *
 
 
 class FileNameManager:
