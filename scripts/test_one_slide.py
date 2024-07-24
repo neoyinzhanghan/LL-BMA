@@ -1,8 +1,8 @@
 import os
 from LLBMA.front_end.api import analyse_bma
 
-slide_path = "/media/hdd1/neo/BMA_AML_lite/H21-2765;S10;MSK7 - 2024-01-02 14.55.59.ndpi"
-dump_dir = "/media/hdd3/neo/LLBMA_dump_test"
+slide_path = "/media/hdd3/BMA_PCM/H22-9425;S12;MSK- - 2023-03-23 10.43.15.ndpi"
+dump_dir = "/media/hdd3/neo/results_dir"
 
 if __name__ == "__main__":
 
