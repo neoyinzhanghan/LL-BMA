@@ -261,6 +261,7 @@ class BMACounter:
                     ),
                 )
 
+                self.save_dir = error_path
                 self.error = True
 
                 # save the exception message as a txt file in the ERROR_save_dir
@@ -1099,6 +1100,8 @@ class BMACounter:
                         "ERROR_" + Path(self.file_name_manager.wsi_path).stem,
                     ),
                 )
+
+                self.save_dir = error_path
 
                 print(f"Error occurred and logged. Continuing to next WSI.")
 

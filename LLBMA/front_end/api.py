@@ -64,7 +64,7 @@ def classify_specimen_type(slide_path):
 def analyse_bma(
     slide_path,
     dump_dir,
-    hoarding=False,
+    hoarding=True,
     continue_on_error=False,
     do_extract_features=False,
     check_specimen_clf=False,
@@ -78,42 +78,45 @@ def analyse_bma(
     In all situations, return the specimen type.
     """
     if check_specimen_clf:
-        # classify the slide specimen type
-        specimen_type = classify_specimen_type(slide_path)
+        raise NotImplementedError(
+            "The check_specimen_clf option is not yet implemented"
+        )
+        # # classify the slide specimen type
+        # specimen_type = classify_specimen_type(slide_path)
 
-        print("Classified Specimen Type:", specimen_type)
+        # print("Classified Specimen Type:", specimen_type)
 
-        if specimen_type == "BMA":
-            # use BMACounter to tally differential
-            bma_counter = BMACounter(
-                slide_path,
-                dump_dir=dump_dir,
-                hoarding=hoarding,
-                continue_on_error=continue_on_error,
-                do_extract_features=do_extract_features,
-            )
-            bma_counter.tally_differential()
+        # if specimen_type == "BMA":
+        #     # use BMACounter to tally differential
+        #     bma_counter = BMACounter(
+        #         slide_path,
+        #         dump_dir=dump_dir,
+        #         hoarding=hoarding,
+        #         continue_on_error=continue_on_error,
+        #         do_extract_features=do_extract_features,
+        #     )
+        #     bma_counter.tally_differential()
 
-        elif specimen_type == "PB":
-            raise SpecimenError(
-                f"Cannot analyze the slide {slide_path} as it is classified as PB"
-            )
+        # elif specimen_type == "PB":
+        #     raise SpecimenError(
+        #         f"Cannot analyze the slide {slide_path} as it is classified as PB"
+        #     )
 
-        elif specimen_type == "MPBorIBMA":
+        # elif specimen_type == "MPBorIBMA":
 
-            # warn the user that the slide is classified as MPBorIBMA without raising an error
-            print(
-                f"UserWarning: The slide {slide_path} as it is classified as MPBorIBMA by the Specimen Classifier. Running BMACounter to tally differential on inadequate BMA or manual PB specimens would likely lead to bad results."
-            )
-            # use BMACounter to tally differential
-            bma_counter = BMACounter(
-                slide_path,
-                dump_dir=dump_dir,
-                hoarding=hoarding,
-                continue_on_error=continue_on_error,
-                do_extract_features=do_extract_features,
-            )
-            bma_counter.tally_differential()
+        #     # warn the user that the slide is classified as MPBorIBMA without raising an error
+        #     print(
+        #         f"UserWarning: The slide {slide_path} as it is classified as MPBorIBMA by the Specimen Classifier. Running BMACounter to tally differential on inadequate BMA or manual PB specimens would likely lead to bad results."
+        #     )
+        #     # use BMACounter to tally differential
+        #     bma_counter = BMACounter(
+        #         slide_path,
+        #         dump_dir=dump_dir,
+        #         hoarding=hoarding,
+        #         continue_on_error=continue_on_error,
+        #         do_extract_features=do_extract_features,
+        #     )
+        #     bma_counter.tally_differential()
 
     else:
         # use BMACounter to tally differential
@@ -125,3 +128,5 @@ def analyse_bma(
             do_extract_features=do_extract_features,
         )
         bma_counter.tally_differential()
+
+        return bma_counter.save_dir, bma_counter.error
