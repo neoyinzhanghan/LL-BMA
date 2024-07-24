@@ -108,6 +108,7 @@ def analyse_bma(
             # use BMACounter to tally differential
             bma_counter = BMACounter(
                 slide_path,
+                dump_dir=dump_dir,
                 hoarding=hoarding,
                 continue_on_error=continue_on_error,
                 do_extract_features=do_extract_features,
@@ -118,6 +119,7 @@ def analyse_bma(
         # use BMACounter to tally differential
         bma_counter = BMACounter(
             slide_path,
+            dump_dir=dump_dir,
             hoarding=hoarding,
             continue_on_error=continue_on_error,
             do_extract_features=do_extract_features,
