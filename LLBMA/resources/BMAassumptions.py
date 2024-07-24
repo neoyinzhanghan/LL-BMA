@@ -15,7 +15,10 @@ assumed_mpp_level_0 = 0.2297952524300848
 assumed_search_view_downsample_rate = 8
 assumed_top_view_downsample_rate = 128
 
-search_view_crop_size = (1536, 768) # I am pretty sure this is only used for the peripheral blood counter pipeline so not relevant here
+search_view_crop_size = (
+    1536,
+    768,
+)  # I am pretty sure this is only used for the peripheral blood counter pipeline so not relevant here
 
 #######################
 ### Quality Control ###
@@ -56,13 +59,13 @@ min_num_focus_regions = 10
 ###########################
 
 num_gpus = 2
-num_cpus = 12
-num_croppers = 32
+num_cpus = 64
+num_croppers = 64
 num_YOLOManagers = 2
 max_num_wbc_per_manager = max_num_cells // num_YOLOManagers
 num_labellers = 2
 num_region_clf_managers = 2
-num_focus_region_makers = 32
+num_focus_region_makers = 64
 num_gpus_per_manager = 1
 num_cpus_per_manager = num_cpus // (num_gpus // num_gpus_per_manager)
 num_cpus_per_cropper = num_cpus // num_croppers
