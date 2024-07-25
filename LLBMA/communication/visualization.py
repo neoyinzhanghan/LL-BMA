@@ -27,9 +27,9 @@ def annotate_focus_region(image, bboxes):
         print(bbox[0], bbox[1], bbox[2], bbox[3])
         print(type(bbox[0]), type(bbox[1]), type(bbox[2]), type(bbox[3]))
 
-        import sys
+        # import sys
 
-        sys.exit()
+        # sys.exit()
         image = cv2.rectangle(
             image, (bbox[0], bbox[1]), (bbox[2], bbox[3]), (255, 0, 0), 3
         )
