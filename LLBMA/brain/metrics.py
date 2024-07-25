@@ -28,15 +28,29 @@ def bb_intersection_over_union(boxA, boxB):
     # return the intersection over union value
     return iou
 
-def _one_contains_the_other(focus, another_focus, snap_shot_size, focus_region_size, search_view_downsampling_rate, area_prop_thres=0.5):
-    """ The bounding box is of size snap_shot_size around the focus as centered
+
+def _one_contains_the_other(
+    focus,
+    another_focus,
+    snap_shot_size,
+    focus_region_size,
+    search_view_downsampling_rate,
+    area_prop_thres=0.5,
+):
+    """The bounding box is of size snap_shot_size around the focus as centered
     If the snap shot bounding box of another_focus overlaps with the focus region bounding box of focus for more than area_prop_thres proportion of the snap shot area,
     then return True, otherwise return False.
     """
 
     # must convert the coordinates of the foci to the level 0 view
-    focus = (focus[0] * search_view_downsampling_rate, focus[1] * search_view_downsampling_rate)
-    another_focus = (another_focus[0] * search_view_downsampling_rate, another_focus[1] * search_view_downsampling_rate)
+    focus = (
+        focus[0] * search_view_downsampling_rate,
+        focus[1] * search_view_downsampling_rate,
+    )
+    another_focus = (
+        another_focus[0] * search_view_downsampling_rate,
+        another_focus[1] * search_view_downsampling_rate,
+    )
 
     FR_TL_x = focus[0] - focus_region_size // 2
     FR_TL_y = focus[1] - focus_region_size // 2
@@ -53,4 +67,4 @@ def _one_contains_the_other(focus, another_focus, snap_shot_size, focus_region_s
     # compute the area of intersection rectangle
     interArea = abs(max((xB - xA, 0)) * max((yB - yA), 0))
 
-    return interArea / snap_shot_size ** 2 > area_prop_thres
+    return interArea / snap_shot_size**2 > area_prop_thres
