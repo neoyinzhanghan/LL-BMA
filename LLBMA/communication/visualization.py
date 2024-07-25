@@ -31,7 +31,7 @@ def annotate_focus_region(image, bboxes):
 
         # sys.exit()
         image = cv2.rectangle(
-            image, (bbox[0], bbox[1]), (bbox[2], bbox[3]), (255, 0, 0), 3
+            image, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (255, 0, 0), 3
         )
 
     # convert the image back to PIL image
