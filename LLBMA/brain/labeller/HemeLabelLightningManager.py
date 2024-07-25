@@ -189,6 +189,8 @@ def predict_batch(pil_images, model):
     # Process each output as in the original code snippet
     predictions = []
     for output in outputs:
+        # apply softmax to the output
+        output = F.softmax(output, dim=0)
         output = output.detach().cpu().numpy()
         predictions.append(tuple(output))
 
