@@ -22,6 +22,9 @@ from torch.utils.data import DataLoader
 from torch import nn
 from pytorch_lightning.loggers import TensorBoardLogger
 from torchvision import transforms, datasets, models
+import torchvision.models as models
+from torchvision.models import ResNeXt50_32X4D_Weights
+
 from torchmetrics import Accuracy, AUROC
 from torch.utils.data import WeightedRandomSampler
 
@@ -49,7 +52,9 @@ num_classes = 23
 class Myresnext50(pl.LightningModule):
     def __init__(self, num_classes=23, config=default_config):
         super(Myresnext50, self).__init__()
-        self.pretrained = models.resnext50_32x4d(pretrained=True)
+        self.pretrained = models.resnext50_32x4d(
+            weights=ResNeXt50_32X4D_Weights.DEFAULT
+        )
         self.pretrained.fc = nn.Linear(self.pretrained.fc.in_features, num_classes)
         # self.my_new_layers = nn.Sequential(
         #     nn.Linear(
