@@ -75,9 +75,11 @@ def YOLO_detect(model, image, conf_thres, verbose=False):
     #     in absolute pixel coordinates, and BR_y, for instance, stands for the y
     #     coordinate of the bottom-right corner.
 
-    df = pd.DataFrame(columns=["TL_x", "TL_y", "BR_x", "BR_y", "confidence", "class"])
+    # df = pd.DataFrame(columns=["TL_x", "TL_y", "BR_x", "BR_y", "confidence", "class"])
 
     l1 = len(boxes)
+
+    rows = []
 
     for i in range(l1):
         box = boxes[i]
@@ -87,16 +89,22 @@ def YOLO_detect(model, image, conf_thres, verbose=False):
         conf = float(box[4])
         cls = int(box[5])
 
-        # use pd.concat instead of append to avoid deprecation
-        df = pd.concat(
-            [
-                df,
-                pd.DataFrame(
-                    [[TL_x, TL_y, BR_x, BR_y, conf, cls]],
-                    columns=["TL_x", "TL_y", "BR_x", "BR_y", "confidence", "class"],
-                ),
-            ]
-        )
+        rows.append([TL_x, TL_y, BR_x, BR_y, conf, cls])
+
+        # # use pd.concat instead of append to avoid deprecation
+        # df = pd.concat(
+        #     [
+        #         df,
+        #         pd.DataFrame(
+        #             [[TL_x, TL_y, BR_x, BR_y, conf, cls]],
+        #             columns=["TL_x", "TL_y", "BR_x", "BR_y", "confidence", "class"],
+        #         ),
+        #     ]
+        # )
+
+    df = pd.DataFrame(
+        rows, columns=["TL_x", "TL_y", "BR_x", "BR_y", "confidence", "class"]
+    )
 
     if verbose:  # draw the bounding boxes on the image and display it
         # draw the bounding boxes on the image
