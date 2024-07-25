@@ -6,10 +6,10 @@ def bb_intersection_over_union(boxA, boxB):
     Assuming the boxes are stored in an iterable of length 4. In the format of (TL_x, TL_y, BR_x, BR_y).
     """
     # determine the (x, y)-coordinates of the intersection rectangle
-    xA = max(boxA[0], boxB[0])
-    yA = max(boxA[1], boxB[1])
-    xB = min(boxA[2], boxB[2])
-    yB = min(boxA[3], boxB[3])
+    xA = max(boxA.iloc[0], boxB.iloc[0])
+    yA = max(boxA.iloc[1], boxB.iloc[1])
+    xB = min(boxA.iloc[2], boxB.iloc[2])
+    yB = min(boxA.iloc[3], boxB.iloc[3])
 
     # compute the area of intersection rectangle
     interArea = abs(max((xB - xA, 0)) * max((yB - yA), 0))
@@ -17,8 +17,8 @@ def bb_intersection_over_union(boxA, boxB):
         return 0
     # compute the area of both the prediction and ground-truth
     # rectangles
-    boxAArea = abs((boxA[2] - boxA[0]) * (boxA[3] - boxA[1]))
-    boxBArea = abs((boxB[2] - boxB[0]) * (boxB[3] - boxB[1]))
+    boxAArea = abs((boxA.iloc[2] - boxA.iloc[0]) * (boxA.iloc[3] - boxA.iloc[1]))
+    boxBArea = abs((boxB.iloc[2] - boxB.iloc[0]) * (boxB.iloc[3] - boxB.iloc[1]))
 
     # compute the intersection over union by taking the intersection
     # area and dividing it by the sum of prediction + ground-truth
