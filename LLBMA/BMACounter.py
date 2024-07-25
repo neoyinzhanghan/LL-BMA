@@ -38,7 +38,6 @@ from LLBMA.BMAFocusRegion import *
 from LLBMA.BMAFocusRegionTracker import FocusRegionsTracker, NotEnoughFocusRegionsError
 from LLBMA.brain.BMAHighMagRegionCheckTracker import BMAHighMagRegionCheckTracker
 from LLBMA.resources.BMAassumptions import *
-from LLBMA.communication.silencer import RayLoggingSilencer
 
 
 class BMACounter:
@@ -481,115 +480,112 @@ class BMACounter:
         # make the directory save_dir/cells
         os.makedirs(os.path.join(self.save_dir, "cells"), exist_ok=True)
 
-        with RayLoggingSilencer():
-            ray.shutdown()
-            # ray.init(num_cpus=num_cpus, num_gpus=num_gpus)
-            ray.init()
+        ray.shutdown()
+        # ray.init(num_cpus=num_cpus, num_gpus=num_gpus)
+        ray.init()
 
-            if self.verbose:
-                print("Initializing YOLOManager")
-            task_managers = [
-                YOLOManager.remote(
-                    YOLO_ckpt_path,
-                    YOLO_conf_thres,
-                    save_dir=self.save_dir,
-                    hoarding=self.hoarding,
-                )
-                for _ in range(num_YOLOManagers)
-            ]
-
-            list_of_batches = create_list_of_batches_from_list(
-                self.focus_regions, YOLO_batch_size
+        if self.verbose:
+            print("Initializing YOLOManager")
+        task_managers = [
+            YOLOManager.remote(
+                YOLO_ckpt_path,
+                YOLO_conf_thres,
+                save_dir=self.save_dir,
+                hoarding=self.hoarding,
             )
+            for _ in range(num_YOLOManagers)
+        ]
 
-            tasks = {}
-            all_results = []
-            new_focus_regions = []
+        list_of_batches = create_list_of_batches_from_list(
+            self.focus_regions, YOLO_batch_size
+        )
 
-            for i, batch in enumerate(list_of_batches):
-                manager = task_managers[i % num_YOLOManagers]
-                task = manager.async_find_wbc_candidates_batch.remote(batch)
-                tasks[task] = batch
+        tasks = {}
+        all_results = []
+        new_focus_regions = []
 
-            with tqdm(
-                total=len(self.focus_regions), desc="Detecting WBC candidates"
-            ) as pbar:
-                while tasks:
-                    done_ids, _ = ray.wait(list(tasks.keys()))
+        for i, batch in enumerate(list_of_batches):
+            manager = task_managers[i % num_YOLOManagers]
+            task = manager.async_find_wbc_candidates_batch.remote(batch)
+            tasks[task] = batch
 
-                    for done_id in done_ids:
-                        try:
-                            batch_focus_regions = ray.get(done_id)
-                            for focus_region in batch_focus_regions:
-                                if focus_region is not None:
-                                    new_focus_regions.append(focus_region)
-                                    for wbc_candidate in focus_region.wbc_candidates:
-                                        all_results.append(wbc_candidate)
+        with tqdm(
+            total=len(self.focus_regions), desc="Detecting WBC candidates"
+        ) as pbar:
+            while tasks:
+                done_ids, _ = ray.wait(list(tasks.keys()))
 
-                                pbar.update()
+                for done_id in done_ids:
+                    try:
+                        batch_focus_regions = ray.get(done_id)
+                        for focus_region in batch_focus_regions:
+                            if focus_region is not None:
+                                new_focus_regions.append(focus_region)
+                                for wbc_candidate in focus_region.wbc_candidates:
+                                    all_results.append(wbc_candidate)
 
-                        except RayTaskError as e:
-                            self.error = True
-                            print(
-                                f"Task for focus {tasks[done_id]} failed with error: {e}"
-                            )
+                            pbar.update()
 
-                        del tasks[done_id]
+                    except RayTaskError as e:
+                        self.error = True
+                        print(f"Task for focus {tasks[done_id]} failed with error: {e}")
 
-            if self.verbose:
-                print(f"Shutting down Ray")
+                    del tasks[done_id]
 
-            self.wbc_candidates = all_results  # the candidates here should be aliased with the candidates saved in focus_regions
-            self.focus_regions = new_focus_regions  # these do not include all the focus regions, only the ones that have wbc_candidates before the max_num_candidates is reached
+        if self.verbose:
+            print(f"Shutting down Ray")
 
-            # for i, focus_region in enumerate(self.focus_regions):
-            #     manager = task_managers[i % num_YOLOManagers]
-            #     task = manager.async_find_wbc_candidates.remote(focus_region)
-            #     tasks[task] = focus_region
+        self.wbc_candidates = all_results  # the candidates here should be aliased with the candidates saved in focus_regions
+        self.focus_regions = new_focus_regions  # these do not include all the focus regions, only the ones that have wbc_candidates before the max_num_candidates is reached
 
-            # with tqdm(
-            #     total=len(self.focus_regions), desc="Detecting WBC candidates"
-            # ) as pbar:
-            #     while tasks:
-            #         done_ids, _ = ray.wait(list(tasks.keys()))
+        # for i, focus_region in enumerate(self.focus_regions):
+        #     manager = task_managers[i % num_YOLOManagers]
+        #     task = manager.async_find_wbc_candidates.remote(focus_region)
+        #     tasks[task] = focus_region
 
-            #         for done_id in done_ids:
-            #             try:
-            #                 new_focus_region = ray.get(done_id)
-            #                 for wbc_candidate in new_focus_region.wbc_candidates:
-            #                     all_results.append(wbc_candidate)
-            #                 if len(all_results) > max_num_candidates:
-            #                     raise TooManyCandidatesError(
-            #                         f"Too many candidates found. max_num_candidates {max_num_candidates} is exceeded. Increase max_num_candidates or check code and slide for error."
-            #                     )
-            #                 new_focus_regions.append(new_focus_region)
+        # with tqdm(
+        #     total=len(self.focus_regions), desc="Detecting WBC candidates"
+        # ) as pbar:
+        #     while tasks:
+        #         done_ids, _ = ray.wait(list(tasks.keys()))
 
-            #             except RayTaskError as e:
-            #                 print(f"Task for focus {tasks[done_id]} failed with error: {e}")
+        #         for done_id in done_ids:
+        #             try:
+        #                 new_focus_region = ray.get(done_id)
+        #                 for wbc_candidate in new_focus_region.wbc_candidates:
+        #                     all_results.append(wbc_candidate)
+        #                 if len(all_results) > max_num_candidates:
+        #                     raise TooManyCandidatesError(
+        #                         f"Too many candidates found. max_num_candidates {max_num_candidates} is exceeded. Increase max_num_candidates or check code and slide for error."
+        #                     )
+        #                 new_focus_regions.append(new_focus_region)
 
-            #             pbar.update()
-            #             del tasks[done_id]
+        #             except RayTaskError as e:
+        #                 print(f"Task for focus {tasks[done_id]} failed with error: {e}")
 
-            # Regardless of hoarding, save a plot of the distribution of confidence score for all the detected cells, the distribution of number of cells detected per region, and the mean and sd thereof.
-            # Plots should be saved at save_dir/focus_regions/YOLO_confidence.jpg and save_dir/focus_regions/num_cells_per_region.jpg
-            # Save a dataframe which trackers the number of cells detected for each region in save_dir/focus_regions/num_cells_per_region.csv
-            # Save a big cell dataframe which have the cell id, region_id, confidence, VoL, and coordinates in save_dir/cells/cells_info.csv
-            # The mean and sd should be saved as a part of the save_dir/cells/cell_detection.yaml file using yaml
+        #             pbar.update()
+        #             del tasks[done_id]
 
-            # first compile the big cell dataframe
-            # traverse through the wbc_candidates and add their info
-            # create a list of dictionaries
+        # Regardless of hoarding, save a plot of the distribution of confidence score for all the detected cells, the distribution of number of cells detected per region, and the mean and sd thereof.
+        # Plots should be saved at save_dir/focus_regions/YOLO_confidence.jpg and save_dir/focus_regions/num_cells_per_region.jpg
+        # Save a dataframe which trackers the number of cells detected for each region in save_dir/focus_regions/num_cells_per_region.csv
+        # Save a big cell dataframe which have the cell id, region_id, confidence, VoL, and coordinates in save_dir/cells/cells_info.csv
+        # The mean and sd should be saved as a part of the save_dir/cells/cell_detection.yaml file using yaml
 
-            # Initiate remote calls and get futures
-            futures = [manager.get_num_detected.remote() for manager in task_managers]
+        # first compile the big cell dataframe
+        # traverse through the wbc_candidates and add their info
+        # create a list of dictionaries
 
-            # Wait for all futures to complete and retrieve the results
-            num_detected_values = ray.get(futures)
+        # Initiate remote calls and get futures
+        futures = [manager.get_num_detected.remote() for manager in task_managers]
 
-            # Sum the results
-            total_detected = sum(num_detected_values)
+        # Wait for all futures to complete and retrieve the results
+        num_detected_values = ray.get(futures)
 
-            ray.shutdown()
+        # Sum the results
+        total_detected = sum(num_detected_values)
+
+        ray.shutdown()
 
         big_cell_df_dct = {
             "local_idx": [],
