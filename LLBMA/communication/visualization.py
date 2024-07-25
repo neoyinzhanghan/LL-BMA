@@ -12,7 +12,6 @@ import cv2
 import numpy as np
 
 
-
 def annotate_focus_region(image, bboxes):
     """Return the image of the focus region annotated with the WBC candidates.
     bboxes is a list of tuples of the form (TL_x, TL_y, BR_x, BR_y).
@@ -24,6 +23,13 @@ def annotate_focus_region(image, bboxes):
 
     # draw the bounding boxes in color red
     for bbox in bboxes:
+        print(bbox)
+        print(bbox[0], bbox[1], bbox[2], bbox[3])
+        print(type(bbox[0]), type(bbox[1]), type(bbox[2]), type(bbox[3]))
+
+        import sys
+
+        sys.exit()
         image = cv2.rectangle(
             image, (bbox[0], bbox[1]), (bbox[2], bbox[3]), (255, 0, 0), 3
         )
@@ -64,7 +70,11 @@ def save_hist_KDE_rug_plot(df, column_name, save_path, title, lines=[]):
 
     # Create the histogram with KDE plot, changing 'stat' from 'density' to 'count' for mass
     sns.histplot(
-        df_for_plot[column_name], kde=True, color="#606060", stat="count", edgecolor="none"
+        df_for_plot[column_name],
+        kde=True,
+        color="#606060",
+        stat="count",
+        edgecolor="none",
     )  # Even brighter grey
 
     # Add rug plot
@@ -210,7 +220,9 @@ def save_bar_chart(
     plt.close()
 
 
-def draw_dashed_rect(image, top_left, bottom_right, color="green", dash=(10, 10), width=3):
+def draw_dashed_rect(
+    image, top_left, bottom_right, color="green", dash=(10, 10), width=3
+):
     """
     Draws a dashed rectangle on an image.
 
