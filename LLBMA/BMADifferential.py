@@ -25,23 +25,34 @@ class Differential:
     def __init__(self, wbc_candidates):
         """Initialize a Differential object. The input is a list of WBCCandidate objects."""
 
-        # initialize the dataframe
-        df = pd.DataFrame(
-            columns=[
-                "focus_region_idx",
-                "local_idx",
-                "name",
-                "confidence",
-                "VoL",
-            ]
-            + [cellnames[i] for i in range(num_classes)]
-        )
+        # # initialize the dataframe
+        # df = pd.DataFrame(
+        #     columns=[
+        #         "focus_region_idx",
+        #         "local_idx",
+        #         "name",
+        #         "confidence",
+        #         "VoL",
+        #     ]
+        #     + [cellnames[i] for i in range(num_classes)]
+        # )
 
+        columns = [
+            "focus_region_idx",
+            "local_idx",
+            "name",
+            "confidence",
+            "VoL",
+        ] + [cellnames[i] for i in range(num_classes)]
+
+        rows = []
         # traverse through the list of WBCCandidate objects and add them to the dataframe
         for ind in range(len(wbc_candidates)):
             # use concat to avoid deprecation
             new_df = wbc_candidates[ind].compute_cell_info()
-            df = pd.concat([df, new_df], ignore_index=True)
+            rows.append(new_df)
+
+        df = pd.concat(rows, ignore_index=True)
 
         self.wbc_candidate_df = df
 
