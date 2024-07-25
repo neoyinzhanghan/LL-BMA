@@ -23,15 +23,12 @@ def annotate_focus_region(image, bboxes):
 
     # draw the bounding boxes in color red
     for bbox in bboxes:
-        print(bbox)
-        print(bbox[0], bbox[1], bbox[2], bbox[3])
-        print(type(bbox[0]), type(bbox[1]), type(bbox[2]), type(bbox[3]))
-
-        # import sys
-
-        # sys.exit()
         image = cv2.rectangle(
-            image, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (255, 0, 0), 3
+            image,
+            (int(bbox[0]), int(bbox[1])),
+            (int(bbox[2]), int(bbox[3])),
+            (255, 0, 0),
+            3,
         )
 
     # convert the image back to PIL image
