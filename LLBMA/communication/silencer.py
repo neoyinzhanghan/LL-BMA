@@ -1,7 +1,7 @@
 import os
 import ray
 
-class RayLoggingSilencer:
+class RayLoggingSilencer: # HONESTLY THIS AINT DOING JACK SHIT
     def __enter__(self):
         # Backup current environment variables
         self.old_env = os.environ.copy()
