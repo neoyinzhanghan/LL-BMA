@@ -1,20 +1,14 @@
-import logging
-
+import os
+import ray
 
 class RayLoggingSilencer:
-    def __init__(self):
-        self.previous_levels = {}
-        self.ray_loggers = ["ray", "ray.rllib", "ray.tune"]
-
     def __enter__(self):
-        # Backup current logging levels and set to ERROR for Ray loggers
-        for logger_name in self.ray_loggers:
-            logger = logging.getLogger(logger_name)
-            self.previous_levels[logger_name] = logger.level
-            logger.setLevel(logging.ERROR)
-
+        # Backup current environment variables
+        self.old_env = os.environ.copy()
+        # Set the RAY_DEDUP_LOGS environment variable
+        os.environ["RAY_DEDUP_LOGS"] = "0"
+    
     def __exit__(self, exc_type, exc_value, traceback):
-        # Restore previous logging levels
-        for logger_name, level in self.previous_levels.items():
-            logger = logging.getLogger(logger_name)
-            logger.setLevel(level)
+        # Restore previous environment variables
+        os.environ.clear()
+        os.environ.update(self.old_env)
