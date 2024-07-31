@@ -68,6 +68,7 @@ def analyse_bma(
     continue_on_error=False,
     do_extract_features=False,
     check_specimen_clf=False,
+    **kwargs,
 ):
     """First classify the slide specimen type.
     --If BMA, then use BMACounter to tally differential.
