@@ -68,6 +68,7 @@ def analyse_bma(
     continue_on_error=False,
     do_extract_features=False,
     check_specimen_clf=False,
+    ignore_specimen_type=True,
     **kwargs,
 ):
     """First classify the slide specimen type.
@@ -127,6 +128,7 @@ def analyse_bma(
             hoarding=hoarding,
             continue_on_error=continue_on_error,
             do_extract_features=do_extract_features,
+            ignore_specimen_type=ignore_specimen_type,
         )
         bma_counter.tally_differential()
 
