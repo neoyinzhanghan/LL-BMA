@@ -5,7 +5,6 @@
 # Outside imports ##################################################################################`
 import openslide
 import ray
-import pyvips
 
 # Within package imports ###########################################################################
 from LLBMA.vision.image_quality import VoL
@@ -31,11 +30,6 @@ class WSICropManager:
         """Open the WSI."""
 
         self.wsi = openslide.OpenSlide(self.wsi_path)
-
-    def open_vips(self):
-        """Open the WSI with pyvips."""
-
-        self.wsi = pyvips.Image.new_from_file(self.wsi_path, access="sequential")
 
     def close_slide(self):
         """Close the WSI."""
